@@ -1,0 +1,32 @@
+
+// The gain for a simple P loop
+double kP = 1;
+
+// The heading of the robot when starting the motion
+double heading;
+
+// Initialize motor controllers and drive
+Spark left1 = new Spark(0);
+Spark left2 = new Spark(1);
+
+Spark right1 = new Spark(2);
+Spark right2 = new Spark(3);
+
+SpeedControllerGroup leftMotors = new SpeedControllerGroup(left1, left2);
+SpeedControllerGroup rightMotors = new SpeedControllerGroup(right1, right2);
+
+DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
+
+@Override
+public void autonomousInit() {
+    // Set setpoint to current heading at start of auto
+    heading = gyro.getAngle();
+}
+
+@Override
+public void autonomousPeriodic() {
+    double error = heading - gyro.getAngle();
+
+    // Drives forward continuously at half speed, using the gyro to stabilize the heading
+    drive.tankDrive(.5 + kP * error, .5 - kP * error);
+}
